@@ -20,6 +20,7 @@ const (
 	INEQ
 	INID
 	INNUM
+	INSTRING
 	ENTERING_COMMENT
 	IN_COMMENT
 	EXITING_COMMENT
@@ -57,6 +58,7 @@ const (
 
 	ID
 	NUM
+	STRING
 
 	DECLARE_ASSIGN
 	ASSIGN
@@ -169,6 +171,9 @@ func (l *LexInfo) String() string {
 
 	case NUM:
 		return strconv.Itoa(lineno) + " NUM, val=" + l.tokenString
+
+	case STRING:
+		return strconv.Itoa(lineno) + " STRING, string=" + l.tokenString
 
 	case ID:
 		return strconv.Itoa(lineno) + " ID, name=" + l.tokenString

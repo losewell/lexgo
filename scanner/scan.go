@@ -31,6 +31,7 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 	var state StateType
 	var currentToken TokenType
 	var save bool
+	hasEscapeChar := false
 
 	b := make([]byte, 1)
 	for {
@@ -49,7 +50,7 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 				state = INNUM
 			} else if unicode.IsLetter(rune(c)) {
 				state = INID
-			} else if unicode.IsSpace(rune(c)) {
+			} else if unicode.IsSpace(rune(c)) || c == ',' || c == '.'{
 				save = false
 				if c == '\n' {
 					lineno++
@@ -58,7 +59,10 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 				state = IN_DECLARE_ASSIGN
 			} else if c == '=' {
 				state = INASSIGN
-			} else if c == '/' {
+			} else if c == '"' {
+				save = false
+				state = INSTRING
+			}else if c == '/' {
 				save = false
 				state = ENTERING_COMMENT
 			} else {
@@ -143,11 +147,17 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 		case INNUM:
 			if !unicode.IsDigit(rune(c)) {
 				ungetNextChar(f)
-				//if unicode.IsSpace(rune(c)) {
-					currentToken = NUM
-				//} else {
-				//	currentToken = ERROR
-				//}
+				currentToken = NUM
+				state = DONE
+				save = false
+			}
+
+		case INSTRING:
+			if c == '\\' && !hasEscapeChar {
+				save = false
+				hasEscapeChar = true
+			} else if c == '"' && !hasEscapeChar {
+				currentToken = STRING
 				state = DONE
 				save = false
 			}
@@ -155,11 +165,7 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 		case INID:
 			if !unicode.IsLetter(rune(c)) {
 				ungetNextChar(f)
-				//if unicode.IsSpace(rune(c)) {
-					currentToken = ID
-				//} else {
-				//	currentToken = ERROR
-				//}
+				currentToken = ID
 				state = DONE
 				save = false
 			}
