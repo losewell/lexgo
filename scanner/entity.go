@@ -21,6 +21,7 @@ const (
 	INID
 	INNUM
 	INSTRING
+	INNEQ
 	ENTERING_COMMENT
 	IN_COMMENT
 	EXITING_COMMENT
@@ -63,6 +64,7 @@ const (
 	DECLARE_ASSIGN
 	ASSIGN
 	EQ
+	NEQ
 	MT
 	LT
 	PLUS
@@ -76,6 +78,10 @@ const (
 	RBRACE
 	LQUOTA
 	RQUOTA
+
+	AND
+	NOT
+	ORL
 
 	ENDFILE
 	ERROR
@@ -127,6 +133,9 @@ func (l *LexInfo) String() string {
 	case EQ:
 		return strconv.Itoa(lineno) + " =="
 
+	case NEQ:
+		return strconv.Itoa(lineno) + "!="
+
 	case LT:
 		return strconv.Itoa(lineno) + " <"
 
@@ -157,14 +166,11 @@ func (l *LexInfo) String() string {
 	case RBRACE:
 		return strconv.Itoa(lineno) + " }"
 
-	case RQUOTA:
-		return strconv.Itoa(lineno) + " \""
-
-	case LQUOTA:
-		return strconv.Itoa(lineno) +  "\""
-
 	case SEMI:
 		return strconv.Itoa(lineno) + " ;"
+
+	case NOT:
+		return strconv.Itoa(lineno) + " !"
 
 	case ENDFILE:
 		return strconv.Itoa(lineno) + " EOF"

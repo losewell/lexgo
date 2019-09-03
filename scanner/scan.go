@@ -62,10 +62,12 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 			} else if c == '"' {
 				save = false
 				state = INSTRING
-			}else if c == '/' {
+			} else if c == '/' {
 				save = false
 				state = ENTERING_COMMENT
-			} else {
+			} else if c == '!' {
+				state = INNEQ
+			}else {
 				state = DONE
 				switch c {
 				case '>':
@@ -88,10 +90,6 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 					currentToken = LBRACE
 				case '}':
 					currentToken = RBRACE
-//				case '\"':
-//					currentToken = LQUOTA
-//				case '\"':
-//					currentToken = RQUOTA
 				case ';':
 					currentToken = SEMI
 				default:
@@ -108,6 +106,16 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 				save = false
 				currentToken = ERROR
 
+			}
+
+		case INNEQ:
+			state = DONE
+			if c == '=' {
+				currentToken = NEQ
+			} else {
+				ungetNextChar(f)
+				save = false
+				currentToken = NOT
 			}
 
 		case INASSIGN:
