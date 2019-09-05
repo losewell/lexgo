@@ -43,6 +43,11 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 			break
 		}
 		c := b[0]
+		if c == '\n' {
+			fmt.Println("current char:", c)
+			lineno++
+			fmt.Println("lineno:", lineno)
+		}
 
 		switch state {
 		case START:
@@ -52,9 +57,6 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 				state = INID
 			} else if unicode.IsSpace(rune(c)) || c == ',' || c == '.'{
 				save = false
-				if c == '\n' {
-					lineno++
-				}
 			} else if c == ':' {
 				state = IN_DECLARE_ASSIGN
 			} else if c == '=' {
@@ -131,25 +133,33 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 		case ENTERING_COMMENT:
 			save = false
 			if c == '*' {
-				state = IN_COMMENT
-			} else {
+				state = IN_COMMENT_1
+			}else if c == '/' {
+				state = IN_COMMENT_2
+			}else {
 				ungetNextChar(f)
-				save = false
 				state = DONE
 				currentToken = OVER
 			}
 
-		case IN_COMMENT:
+		case IN_COMMENT_1:
 			save = false
 			if c == '*' {
 				state = EXITING_COMMENT
 			}
 
+         	case IN_COMMENT_2:
+			save = false
+			if c == '\n' {
+				state = START
+			}
+
 		case EXITING_COMMENT:
 			if c == '/' {
+				save = false
 				state = START
 			} else {
-				state = IN_COMMENT
+				state = IN_COMMENT_1
 			}
 
 		case INNUM:

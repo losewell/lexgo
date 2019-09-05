@@ -23,7 +23,8 @@ const (
 	INSTRING
 	INNEQ
 	ENTERING_COMMENT
-	IN_COMMENT
+	IN_COMMENT_1    // /*...*/ style
+	IN_COMMENT_2    // //... style
 	EXITING_COMMENT
 	DONE
 )
