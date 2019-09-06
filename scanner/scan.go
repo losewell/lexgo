@@ -67,9 +67,15 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 			} else if c == '/' {
 				save = false
 				state = ENTERING_COMMENT
+			} else if c == '&' {
+				save = false
+				state = INAND
+			} else if c == '|' {
+				save = false
+				state = INORL
 			} else if c == '!' {
 				state = INNEQ
-			}else {
+			} else {
 				state = DONE
 				switch c {
 				case '>':
@@ -108,6 +114,26 @@ func getNextToken(f *os.File, fpath, dirname string) error {
 				save = false
 				currentToken = ERROR
 
+			}
+
+		case INAND:
+			state = DONE
+			if c == '&' {
+				currentToken = DOUBLEAND
+			} else {
+				ungetNextChar(f)
+				save = false
+				currentToken = AND
+			}
+
+		case INORL:
+			state = DONE
+			if c == '|' {
+				currentToken = DOUBLEORL
+			} else {
+				ungetNextChar(f)
+				save = false
+				currentToken = ORL
 			}
 
 		case INNEQ:

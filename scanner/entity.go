@@ -18,6 +18,8 @@ const (
 	IN_DECLARE_ASSIGN
 	INASSIGN
 	INEQ
+	INAND    // & or &&
+	INORL    // | or ||
 	INID
 	INNUM
 	INSTRING
@@ -83,6 +85,9 @@ const (
 	AND
 	NOT
 	ORL
+
+	DOUBLEAND
+	DOUBLEORL
 
 	ENDFILE
 	ERROR
@@ -172,6 +177,18 @@ func (l *LexInfo) String() string {
 
 	case NOT:
 		return strconv.Itoa(lineno) + " !"
+
+	case AND:
+		return strconv.Itoa(lineno) + "&"
+
+	case ORL:
+		return strconv.Itoa(lineno) + "|"
+
+	case DOUBLEAND:
+		return strconv.Itoa(lineno) + "&&"
+
+	case DOUBLEORL:
+		return strconv.Itoa(lineno) + "||"
 
 	case ENDFILE:
 		return strconv.Itoa(lineno) + " EOF"
